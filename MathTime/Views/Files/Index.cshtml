@@ -1,0 +1,229 @@
+﻿@model IEnumerable<MathTime.Models.FileItem>
+@using System.Security.Claims
+
+@{
+    ViewData["Title"] = "Файловый центр";
+    var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+}
+
+<style>
+    .file-catalog {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 24px;
+        font-family: 'Segoe UI';
+    }
+
+    .higth1 {
+        font-size: 2.25rem;
+        font-weight: bold;
+        margin-bottom: 16px;
+        color: #1e3a8a;
+        text-align: center;
+    }
+
+    .warning {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+        padding: 12px 16px;
+        border-radius: 6px;
+        margin-bottom: 16px;
+    }
+
+    .notice-strong {
+        background: #d1fae5;
+        color: #065f46;
+        border: 1px solid #6ee7b7;
+        padding: 14px;
+        border-radius: 6px;
+        font-weight: 600;
+        margin-bottom: 16px;
+        text-align: center;
+    }
+
+    .upload-form {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+
+        .upload-form input,
+        .upload-form select {
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+        }
+
+        .upload-form button {
+            background-color: #2563eb;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+        }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    thead {
+        background-color: #e0e7ff;
+    }
+
+    th, td {
+        padding: 12px 16px;
+    }
+
+    tr:hover {
+        background-color: #f0f4ff;
+    }
+
+    .btn-download,
+    .btn-delete {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        min-width: 110px;
+        height: 36px;
+        padding: 0 12px;
+        font-size: 14px;
+        font-weight: 600;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        transition: 0.2s;
+        margin-right: 8px;
+        text-decoration: none;
+    }
+
+    .btn-download {
+        background-color: #2563eb;
+        color: white;
+    }
+
+        .btn-download:hover {
+            background-color: #1d4ed8;
+            transform: scale(1.05);
+        }
+
+    .btn-delete {
+        background-color: #dc2626;
+        color: white;
+    }
+
+        .btn-delete:hover {
+            background-color: #b91c1c;
+            transform: scale(1.05);
+        }
+</style>
+
+<div class="file-catalog">
+
+    <h1 class="higth1">Файловый центр</h1>
+
+    <div class="notice-strong">
+        📁 <strong>Сюда можно загружать презентации, методические разработки, конспекты уроков и другие материалы.</strong>
+    </div>
+
+    <div class="warning">
+        ⚠ Перед загрузкой дайте файлу понятное название.
+    </div>
+
+    <!-- 🔎 ФИЛЬТР -->
+    <form method="get" asp-action="Index" class="upload-form">
+
+        <input type="text" name="searchString"
+               placeholder="Поиск по названию"
+               value="@Context.Request.Query["searchString"]" />
+
+        <select name="category">
+            <option value="">Все категории</option>
+
+            @for (int i = 1; i <= 11; i++)
+            {
+                var value = $"{i} класс";
+                <option value="@value"
+                        selected="@(Context.Request.Query["category"] == value)">
+                    @value
+                </option>
+            }
+
+            <option value="ВПР" selected="@(Context.Request.Query["category"] == "ВПР")">ВПР</option>
+            <option value="ОГЭ" selected="@(Context.Request.Query["category"] == "ОГЭ")">ОГЭ</option>
+            <option value="ЕГЭ" selected="@(Context.Request.Query["category"] == "ЕГЭ")">ЕГЭ</option>
+        </select>
+
+        <button type="submit">Фильтр</button>
+    </form>
+
+    <!-- 📤 ФОРМА ЗАГРУЗКИ -->
+    <form asp-action="Upload" method="post" enctype="multipart/form-data" class="upload-form">
+        @Html.AntiForgeryToken()
+
+        <input type="text" name="displayName" placeholder="Введите название" required />
+
+        <select name="category" required>
+            <option value="">Выберите категорию</option>
+
+            @for (int i = 1; i <= 11; i++)
+            {
+                <option value="@($"{i} класс")">@($"{i} класс")</option>
+            }
+
+            <option value="ВПР">ВПР</option>
+            <option value="ОГЭ">ОГЭ</option>
+            <option value="ЕГЭ">ЕГЭ</option>
+        </select>
+
+        <input type="file" name="uploadedFile" required />
+        <button type="submit">Загрузить</button>
+    </form>
+
+    <!-- 📋 ТАБЛИЦА -->
+    <table>
+        <thead>
+            <tr>
+                <th>Название</th>
+                <th>Категория</th>
+                <th>Тип</th>
+                <th>Размер</th>
+                <th>Дата</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var file in Model)
+            {
+                <tr>
+                    <td>@file.FileName</td>
+                    <td>@file.Category</td>
+                    <td>@file.ContentType</td>
+                    <td>@($"{file.Size / 1024} KB")</td>
+                    <td>@file.UploadedAt.ToString("g")</td>
+                    <td>
+                        <form method="get" asp-action="Download" asp-route-id="@file.Id" style="display:inline;">
+                            <button type="submit" class="btn-download">Скачать</button>
+                        </form>
+
+                        @if (User.IsInRole("Admin") || file.UserId.ToString() == currentUserId)
+                        {
+                            <form asp-action="Delete" asp-route-id="@file.Id" method="post" style="display:inline;">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn-delete">Удалить</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>

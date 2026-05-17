@@ -1,0 +1,252 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>MathTime — Обновлённый дизайн</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #e5e7eb, #f3f4f6);
+            color: #1f2937;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        main {
+            display: flex;
+            padding: 24px;
+            max-width: 1300px;
+            margin: 0 auto;
+            gap: 24px;
+            align-items: flex-start;
+            width: 100%;
+            box-sizing: border-box;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .content {
+            background: white;
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            flex: 3 1 0;
+            box-sizing: border-box;
+            transition: transform 0.3s ease;
+        }
+
+            .content:hover {
+                transform: translateY(-4px);
+            }
+
+            .content p {
+                margin-top: 16px;
+                line-height: 1.6;
+                font-size: 16px;
+                color: #374151;
+            }
+
+        aside {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            flex: 1 1 0;
+            box-sizing: border-box;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            width: 100%;
+            transition: transform 0.3s ease;
+        }
+
+            .card:hover {
+                transform: translateY(-4px);
+            }
+
+            .card h2 {
+                font-size: 20px;
+                font-weight: bold;
+                margin-bottom: 12px;
+            }
+
+            .card li, .card p {
+                font-size: 15px;
+                color: #4b5563;
+                line-height: 1.5;
+            }
+
+                .card p.italic {
+                    font-style: italic;
+                    color: #6b7280;
+                }
+
+        .image-container {
+            text-align: center;
+            margin-top: 32px;
+        }
+
+        .interactive-img {
+            width: 90%;
+            max-width: 520px;
+            height: auto;
+            border-radius: 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            cursor: pointer;
+        }
+
+            .interactive-img:hover {
+                transform: scale(1.05);
+                box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            }
+
+            .interactive-img.clicked {
+                transform: rotate(360deg) scale(1.15);
+                transition: transform 0.9s ease;
+            }
+
+        /* Кнопка Вконтакте */
+        .wa-btn {
+            padding: 14px 24px;
+            background: linear-gradient(90deg, #2563eb, #4f46e5);
+            color: white;
+            border: none;
+            font-size: 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .wa-btn:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 20px rgba(63,81,181,0.3);
+            }
+
+        /* Модальное окно */
+        .wa-modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .wa-modal-content {
+            background: #fff;
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 400px;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .wa-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 28px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        <div class="content">
+            <p>Привет! Мы — креативная команда, стремящаяся поддерживать учителей математики в их профессиональном росте, предоставляя качественные материалы, методики и пространство для общения.</p>
+            <p>Мы уверены, что математика может быть интересной и доступной каждому. Наш сайт создан для того, чтобы учителя могли делиться опытом, находить новые идеи и вдохновлять друг друга.</p>
+            <p>Мы стремимся стать вашим надежным помощником в преподавании: делитесь уроками, задачами, пособиями — помогайте коллегам находить лучшее.</p>
+            <p>Присоединяйтесь — вместе мы сделаем обучение математике увлекательным и эффективным!</p>
+
+            <div class="image-container">
+                <img src="~/images/we.jpg" alt="Учебный кот" class="interactive-img" />
+            </div>
+
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="wa-btn" onclick="openWhatsappModal()">Присоединиться в Вконтакте💜</button>
+            </div>
+        </div>
+
+        <aside>
+            <div class="card">
+                <h2>Новости</h2>
+                <ul>
+                    <li>🆕 Добавлены новые методические материалы</li>
+                    <li>📅 Вебинар «Математика в жизни» — 3 августа</li>
+                    <li>🛠 Обновлён интерфейс платформы</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2>Цитата дня</h2>
+                <p id="quote" class="italic"></p>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Модальное окно ВКонтакте -->
+    <div id="whatsappModal" class="wa-modal">
+        <div class="wa-modal-content">
+            <span class="wa-close" onclick="closeWhatsappModal()">&times;</span>
+            <h2>Присоединяйтесь к нам Вконтакте ❤️</h2>
+            <p>Отсканируйте QR-код или нажмите кнопку ниже:</p>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://vk.me/join/F4eDS0eMj_U3mbE2GgADxxiAsaXQdCnrWI4=" alt="QR Вконтакте" style="width:200px; height:200px; margin:15px auto; display:block;">
+            <a href="https://vk.me/join/F4eDS0eMj_U3mbE2GgADxxiAsaXQdCnrWI4=" target="_blank">
+                <button class="wa-btn">Написать в Вконтакте</button>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Анимация изображения
+        const img = document.querySelector('.interactive-img');
+        img.addEventListener('click', () => {
+            img.classList.add('clicked');
+            setTimeout(() => img.classList.remove('clicked'), 900);
+        });
+
+        // Модальное окно ВК
+        function openWhatsappModal() {
+            document.getElementById('whatsappModal').style.display = 'flex';
+        }
+        function closeWhatsappModal() {
+            document.getElementById('whatsappModal').style.display = 'none';
+        }
+
+        // Цитаты
+        const quotes = [
+            '«Математика — царица наук, а арифметика — царица математики.» — К. Ф. Гаусс',
+            '«Чистая математика — это поэзия логики.» — Альберт Эйнштейн',
+            '«Математика — язык, на котором Бог написал Вселенную.» — Галилео Галилей',
+            '«Математика — это не просто наука, это искусство мыслить.» — С. Л. Ланг'
+        ];
+
+        // Случайная цитата при загрузке страницы
+        const quoteEl = document.getElementById('quote');
+        quoteEl.textContent = quotes[Math.floor(Math.random() * quotes.length)];
+    </script>
+
+</body>
+</html>

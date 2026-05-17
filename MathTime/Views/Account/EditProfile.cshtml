@@ -1,0 +1,182 @@
+﻿@model MathTime.Models.User
+
+@using System.Security.Claims
+@{
+    ViewData["Title"] = "Редактирование профиля";
+
+    string currentRole = User.FindFirstValue(ClaimTypes.Role);
+    int currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+    bool isAdmin = currentRole == "Admin";
+    bool isOwner = currentUserId == Model.Id;
+}
+
+<style>
+    .edit-wrapper {
+        max-width: 500px;
+        margin: 40px auto;
+        padding: 30px;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        text-align: center;
+        animation: fadeIn 0.5s ease;
+    }
+
+        .edit-wrapper h2 {
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+    .form-group {
+        margin-bottom: 15px;
+        text-align: left;
+    }
+
+    label {
+        font-weight: 600;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+    }
+
+    .avatar-preview {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #f0f0f0;
+        margin-bottom: 15px;
+    }
+
+    .avatar-upload label {
+        cursor: pointer;
+        display: inline-block;
+        padding: 6px 12px;
+        background-color: #6f42c1; /* фиолетовый */
+        color: #fff;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .avatar-upload input[type="file"] {
+        display: none;
+    }
+
+    .btn {
+        width: 100%;
+        padding: 10px 16px;
+        border: none;
+        border-radius: 8px;
+        color: #fff;
+        cursor: pointer;
+        font-size: 1rem;
+        margin-top: 10px;
+        background-color: #6f42c1; /* фиолетовый */
+    }
+
+        .btn:hover {
+            background-color: #5936a2;
+        }
+
+    hr {
+        margin: 20px 0;
+        border: 0;
+        border-top: 1px solid #eee;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<div class="edit-wrapper">
+    <h2>Редактировать профиль</h2>
+
+    @* Аватар: менять может владелец или админ *@
+    @if (isOwner || isAdmin)
+    {
+        <form method="post" enctype="multipart/form-data" action="/profile/avatar">
+            @Html.AntiForgeryToken()
+            <div class="avatar-upload">
+                <img class="avatar-preview" src="/avatar/@Model.Id" alt="Аватар">
+                <br />
+                <input type="file" id="avatarInput" name="Avatar" accept="image/*" onchange="this.form.submit()">
+                <label for="avatarInput">Изменить фото</label>
+            </div>
+        </form>
+    }
+    else
+    {
+        <img class="avatar-preview" src="/avatar/@Model.Id" alt="Аватар">
+    }
+
+    <form method="post" action="/profile/edit">
+        @Html.AntiForgeryToken()
+
+        <div class="form-group">
+            <label>Имя</label>
+            <input class="form-control" type="text" name="FirstName" value="@Model.FirstName" required />
+        </div>
+
+        <div class="form-group">
+            <label>Фамилия</label>
+            <input class="form-control" type="text" name="LastName" value="@Model.LastName" required />
+        </div>
+
+        <div class="form-group">
+            <label>Email</label>
+            <input class="form-control" type="email" name="Email" value="@Model.Email" required />
+        </div>
+
+        <div class="form-group">
+            <label>Телефон</label>
+            <input class="form-control" type="text" name="Phone" value="@Model.Phone" />
+        </div>
+
+        <div class="form-group">
+            <label>Дата рождения</label>
+            <input class="form-control" type="date" name="DateOfBirth" value="@Model.DateOfBirth.ToString("yyyy-MM-dd")" />
+        </div>
+
+        <div class="form-group">
+            <label>Пол</label>
+            <select name="Gender" class="form-control">
+                <option value="Male" selected="@(Model.Gender == "Male")">Мужской</option>
+                <option value="Female" selected="@(Model.Gender == "Female")">Женский</option>
+                <option value="" selected="@(string.IsNullOrEmpty(Model.Gender))">Не указан</option>
+            </select>
+        </div>
+
+        <hr />
+
+        <h5>Смена пароля (необязательно)</h5>
+
+        <div class="form-group">
+            <label>Новый пароль</label>
+            <input class="form-control" type="password" name="NewPassword" />
+        </div>
+
+        <div class="form-group">
+            <label>Повторите пароль</label>
+            <input class="form-control" type="password" name="ConfirmPassword" />
+        </div>
+
+        <button type="submit" class="btn">Сохранить изменения</button>
+    </form>
+</div>

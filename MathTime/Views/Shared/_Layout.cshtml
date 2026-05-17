@@ -1,0 +1,307 @@
+﻿@using System.Security.Claims
+
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] - MathTime</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+
+        /* Новый стиль header */
+        header {
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            color: white;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+            header .logo {
+                font-size: 28px;
+                font-weight: 700;
+                letter-spacing: 1px;
+            }
+
+            header nav {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                flex-wrap: wrap;
+            }
+
+                header nav a {
+                    color: white;
+                    text-decoration: none;
+                    font-size: 15px;
+                    font-weight: 500;
+                    padding: 6px 14px;
+                    border-radius: 12px;
+                    transition: all 0.3s ease;
+                }
+
+                    header nav a:hover {
+                        background: rgba(255,255,255,0.2);
+                        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+                    }
+
+        .profile-link, .login-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .profile-link {
+            background: rgba(255,255,255,0.2);
+            color: white !important;
+        }
+
+            .profile-link:hover {
+                background: rgba(255,255,255,0.35);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            }
+
+        .header-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #ffffff66;
+            object-fit: cover;
+        }
+
+        .login-btn {
+            background: rgba(255,255,255,0.2);
+            color: white !important;
+        }
+
+            .login-btn:hover {
+                background: rgba(255,255,255,0.35);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            }
+
+        /* Hero-блок */
+        .hero {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 16px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+            min-height: 400px;
+        }
+
+        .hero-image {
+            flex: 1 1 300px;
+            min-height: 400px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .hero-content {
+            flex: 1 1 300px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            color: white;
+        }
+
+            .hero-content h1 {
+                font-size: 2rem;
+                margin: 0 0 16px 0;
+                font-weight: 700;
+                line-height: 1.2;
+            }
+
+            .hero-content p {
+                font-size: 1rem;
+                margin-bottom: 20px;
+                line-height: 1.5;
+                color: rgba(255,255,255,0.95);
+            }
+
+            .hero-content .highlight {
+                background: linear-gradient(90deg, #fff, #c7d2fe);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                font-weight: 600;
+            }
+
+            .hero-content .cta-btn {
+                padding: 12px 24px;
+                font-size: 16px;
+                font-weight: bold;
+                color: white;
+                background: linear-gradient(90deg, #6366f1, #8b5cf6);
+                border: none;
+                border-radius: 12px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                width: fit-content;
+            }
+
+                .hero-content .cta-btn:hover {
+                    transform: translateY(-3px);
+                    box-shadow: 0 8px 20px rgba(139,92,246,0.4);
+                }
+
+        main {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            padding: 16px;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 14px;
+            color: #6b7280;
+            padding: 16px;
+            margin-top: 32px;
+        }
+
+        #scrollTopBtn {
+            display: none;
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 999;
+            font-size: 24px;
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+            #scrollTopBtn:hover {
+                background-color: #6366f1;
+                transform: translateY(-3px);
+            }
+
+        @@media (max-width: 768px) {
+            .hero
+
+        {
+            flex-direction: column;
+        }
+
+        .hero-image, .hero-content {
+            flex: 1 1 100%;
+            min-height: 300px;
+        }
+
+            .hero-content h1 {
+                font-size: 1.8rem;
+            }
+
+            .hero-content p {
+                font-size: 0.95rem;
+            }
+
+            .hero-content .cta-btn {
+                font-size: 14px;
+                padding: 10px 20px;
+            }
+
+        header {
+            padding: 12px 16px;
+        }
+
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">MathTime</div>
+        <nav>
+            <a asp-controller="Home" asp-action="Index">Главная</a>
+            <a asp-controller="Home" asp-action="About">О нас</a>
+            <a asp-controller="Articles" asp-action="Index">Блог</a>
+            <a asp-controller="Files" asp-action="Index">Каталог файлов</a>
+            <a asp-controller="Library" asp-action="Index">Библиотека</a>
+
+            @if (User.Identity?.IsAuthenticated ?? false)
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var firstName = User.FindFirst("FirstName")?.Value ?? "Профиль";
+
+                <a asp-controller="Profile" asp-action="Index" class="profile-link">
+                    <img src="/avatar/@userId" class="header-avatar" alt="Аватар" />
+                    <span>@firstName</span>
+                </a>
+            }
+            else
+            {
+                <a href="javascript:void(0)" onclick="openLogin()" class="login-btn">Войти</a>
+            }
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-image" style="background-image: url('@Url.Content("~/images/cat1.png")');"></div>
+        <div class="hero-content">
+            <h1>Математика <span class="highlight">объединяет</span> нас</h1>
+            <p>Делимся <span class="highlight">опытом</span> и <span class="highlight">учимся вместе</span>.</p>
+            <p>Образовательная платформа для учителей, студентов и всех, кто интересуется математикой.</p>
+        </div>
+    </section>
+
+    <main>
+        @RenderBody()
+    </main>
+
+    <footer>
+        © 2025 MathTime. Все права защищены.
+    </footer>
+
+    <button id="scrollTopBtn" title="Наверх">⬆</button>
+
+    <script>
+        const scrollTopBtn = document.getElementById("scrollTopBtn");
+        window.onscroll = function() {
+            if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+                scrollTopBtn.style.display = "block";
+            } else {
+                scrollTopBtn.style.display = "none";
+            }
+        };
+
+        scrollTopBtn.addEventListener("click", function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+       
+    </script>
+
+</body>
+</html>

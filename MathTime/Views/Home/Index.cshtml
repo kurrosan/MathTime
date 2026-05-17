@@ -1,0 +1,761 @@
+﻿@using System.Security.Claims
+@{
+    ViewData["Title"] = "Главная";
+
+    var mathQuotes = new string[]
+    {
+        "Математика — царица наук, а арифметика — царица математики. — К. Ф. Гаусс",
+        "Математика — это язык, на котором написана книга природы. — Галилео Галилей",
+        "Чистая математика — это поэзия логики. — Альберт Эйнштейн",
+        "Математика — это способ думать ясно. — Исаак Ньютон",
+        "В математике мы не знаем, что ищем, пока не найдём. — Анри Пуанкаре"
+    };
+
+    var random = new Random();
+    var randomQuote = mathQuotes[random.Next(mathQuotes.Length)];
+}
+
+<!-- Модальное окно Входа -->
+<div id="loginModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeLogin()">&times;</span>
+        <h2>Вход в аккаунт</h2>
+        @if (TempData["LoginError"] != null)
+        {
+            <p style="color:red">@TempData["LoginError"]</p>
+        }
+        <form method="post" action="/login">
+            @Html.AntiForgeryToken()
+            <label for="emailLogin">Email:</label>
+            <input type="email" id="emailLogin" name="Email" required value="@TempData["LoginEmail"]" />
+            <label for="passwordLogin">Пароль:</label>
+            <input type="password" id="passwordLogin" name="Password" required />
+            <button type="submit">Войти</button>
+        </form>
+    </div>
+</div>
+
+<!-- Модальное окно Регистрации -->
+<div id="registerModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeRegister()">&times;</span>
+        <h2>Создать аккаунт</h2>
+        @if (TempData["RegisterError"] != null)
+        {
+            <p style="color:red">@TempData["RegisterError"]</p>
+        }
+        <form method="post" action="/register" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <label for="firstName">Имя:</label>
+            <input type="text" id="firstName" name="FirstName" required />
+            <label for="lastName">Фамилия:</label>
+            <input type="text" id="lastName" name="LastName" required />
+            <label for="phone">Телефон:</label>
+            <input type="tel" id="phone" name="Phone" required />
+            <label for="dob">Дата рождения:</label>
+            <input type="date" id="dob" name="DateOfBirth" required />
+            <label for="gender">Пол:</label>
+            <select id="gender" name="Gender" required>
+                <option value="">Выберите...</option>
+                <option value="Male">Мужской</option>
+                <option value="Female">Женский</option>
+            </select>
+            <label for="emailRegister">Email:</label>
+            <input type="email" id="emailRegister" name="Email" required />
+            <label for="passwordRegister">Пароль:</label>
+            <input type="password" id="passwordRegister" name="Password" required />
+            <label for="confirmPasswordRegister">Подтвердите пароль:</label>
+            <input type="password" id="confirmPasswordRegister" name="ConfirmPassword" required />
+            <label for="avatar">Фото профиля:</label>
+            <input type="file" id="avatar" name="Avatar" accept="image/*" />
+            <button type="submit">Зарегистрироваться</button>
+        </form>
+    </div>
+</div>
+
+<!-- Основной контент -->
+<div class="content">
+    <p>Приветствуем вас! На нашем сайте обучение математике становится увлекательным и продуктивным благодаря совместным усилиям.</p>
+    <ul class="feature-list">
+        <li>📝 <strong>Обменивайтесь опытом:</strong> делитесь методиками, заданиями и лайфхаками.</li>
+        <li>🤝 <strong>Находите поддержку:</strong> задавайте вопросы и решайте задачи вместе с сообществом.</li>
+        <li>🎓 <strong>Участвуйте в событиях:</strong> вебинары, мастер-классы, челленджи и многое другое.</li>
+    </ul>
+    <p>Присоединяйтесь к нам, чтобы сделать математику доступной и интересной для всех!</p>
+    <div style="margin-top:20px; text-align:center;">
+        <button class="wa-btn" onclick="openWhatsappModal()">Присоединяйтесь к нам Вконтакте 🤍</button>
+
+
+    <div>
+        <br></br>
+</div>
+        <div style="margin-top:20px; padding:20px 25px; border-radius:16px; background:linear-gradient(135deg,#eef2ff,#e0e7ff); box-shadow:0 8px 20px rgba(0,0,0,0.1); text-align:center; font-family:Arial, sans-serif;">
+
+            <h2 style="color:#2563eb; font-size:1.8em; margin-bottom:15px;">
+                🛠 Техническая поддержка MathTime
+            </h2>
+
+            <p style="color:#374151; font-size:1em; line-height:1.6; margin-bottom:15px;">
+                Возникли вопросы при работе с платформой? Виртуальный помощник поможет быстро получить ответы по использованию сайта, загрузке материалов, работе со статьями, авторизации и другим функциям системы.
+            </p>
+
+            <ul style="list-style:none; padding-left:0; margin-bottom:20px; text-align:left; display:inline-block;">
+                <li style="margin:8px 0; font-size:1em;">
+                    ✅ Помощь при регистрации и входе в аккаунт.
+                </li>
+
+                <li style="margin:8px 0; font-size:1em;">
+                    ✅ Подсказки по загрузке и скачиванию файлов.
+                </li>
+
+                <li style="margin:8px 0; font-size:1em;">
+                    ✅ Консультации по публикации и редактированию статей.
+                </li>
+
+                <li style="margin:8px 0; font-size:1em;">
+                    ✅ Ответы на частые вопросы пользователей.
+                </li>
+
+                <li style="margin:8px 0; font-size:1em;">
+                    ✅ Поддержка пользователей 24/7.
+                </li>
+            </ul>
+
+            <p style="color:#374151; font-size:1em; line-height:1.6;">
+                Система технической поддержки создана для того, чтобы сделать использование цифрового ресурса максимально удобным и понятным для каждого пользователя.
+            </p>
+
+            <button class="chat-btn"
+                    onclick="openChatModal()"
+                    style="margin-top:15px; background:linear-gradient(90deg,#2563eb,#7c3aed); color:white; font-weight:600; font-size:16px; padding:12px 25px; border:none; border-radius:12px; cursor:pointer;">
+                Открыть поддержку 💬
+            </button>
+
+        </div>
+        <div>
+            <br></br>
+        </div>
+        
+    </div>
+</div>
+
+<aside>
+    <div class="card">
+        @if (User.Identity?.IsAuthenticated ?? false)
+        {
+            <div class="user-card">
+                <img src="/avatar/@User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier)" alt="Аватар" />
+                <p>Привет, <span class="user-name">@User.FindFirst("FirstName")?.Value</span> <span class="user-surname">@User.FindFirst("LastName")?.Value</span>!</p>
+                <form method="post" action="/logout">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="logout-btn">Выйти</button>
+                </form>
+            </div>
+        }
+        else
+        {
+            <div class="auth-links">
+                <a id="loginBtn" class="login-btn" href="javascript:void(0)" onclick="openLogin()">Вход</a>
+                <a id="registerBtn" class="register-btn" href="javascript:void(0)" onclick="openRegister()">Регистрация</a>
+            </div>
+        }
+    </div>
+
+    <div class="card">
+        <h2>Новости</h2>
+        <ul>
+            <li>🆕 Новые методические материалы уже доступны</li>
+            <li>📅 Вебинар "Математика в жизни" — 3 августа</li>
+            <li>🛠 Обновили дизайн платформы</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>Цитата дня</h2>
+        <p class="italic">«@randomQuote»</p>
+    </div>
+</aside>
+
+<!-- Модальное окно ВКонтакте -->
+<div id="whatsappModal" class="wa-modal">
+    <div class="wa-modal-content">
+        <span class="wa-close" onclick="closeWhatsappModal()">&times;</span>
+        <h2>Присоединяйтесь к нам Вконтакте ❤️</h2>
+        <p>Отсканируйте QR-код или нажмите кнопку ниже:</p>
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://vk.me/join/F4eDS0eMj_U3mbE2GgADxxiAsaXQdCnrWI4=" alt="QR Вконтакте">
+        <a href="https://vk.me/join/F4eDS0eMj_U3mbE2GgADxxiAsaXQdCnrWI4=" target="_blank">
+            <button class="wa-action-btn">Написать в Вконтакте</button>
+        </a>
+    </div>
+</div>
+
+<!-- Модальное окно чат-бота -->
+<div id="chatModal" class="wa-modal">
+    <div class="wa-modal-content">
+        <span class="wa-close" onclick="closeChatModal()">&times;</span>
+        <h2 style="text-align:center; color:#4f46e5;">Синусик — ваш помощник 🤖</h2>
+        <div id="chatMessages"></div>
+        <div style="display:flex; gap:8px; margin-top:10px;">
+            <input type="text" id="chatInput" placeholder="Введите сообщение..." />
+            <button onclick="sendMessage()">Отправить</button>
+        </div>
+    </div>
+</div>
+
+<style>
+
+    #chatMessages {
+        height: 300px;
+        overflow-y: auto;
+        border-radius: 12px;
+        padding: 15px;
+        background: #f4f6fb;
+        box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+        font-family: 'Segoe UI', sans-serif;
+        line-height: 1.5;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    /* Сообщения слева для всех */
+    .chat-user, .chat-bot {
+        max-width: 80%;
+        padding: 8px 12px;
+        border-radius: 12px;
+        font-size: 14px;
+        line-height: 1.4;
+        word-wrap: break-word;
+        align-self: flex-start; /* ВСЕ сообщения слева */
+    }
+
+    .chat-user {
+        background: #3b82f6;
+        color: #fff;
+    }
+
+    .chat-bot {
+        background: #e0e7ff;
+        color: #1e293b;
+    }
+
+    /* Инпут и кнопка */
+    #chatInput {
+        flex: 1;
+        padding: 10px;
+        border-radius: 12px;
+        border: 1px solid #cbd5e1;
+        transition: all 0.2s;
+    }
+
+        #chatInput:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 8px rgba(99,102,241,0.3);
+        }
+
+    .wa-modal-content button {
+        background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+        color: white;
+        padding: 10px 15px;
+        border-radius: 12px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+        .wa-modal-content button:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 12px 25px rgba(59,130,246,0.3);
+        }
+
+    /* Модальные окна */
+    .wa-modal {
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        background-color: rgba(0,0,0,0.4);
+        backdrop-filter: blur(4px);
+    }
+
+    .wa-modal-content {
+        background: #fff;
+        padding: 25px 30px;
+        border-radius: 20px;
+        width: 95%;
+        max-width: 450px;
+        position: relative;
+        text-align: left;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+        transform: translateY(-20px);
+        opacity: 0;
+        transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+        .wa-modal-content.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+    /* Кнопка закрытия */
+    .wa-close {
+        position: absolute;
+        top: 18px;
+        right: 18px;
+        font-size: 24px;
+        font-weight: bold;
+        color: #666;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+        .wa-close:hover {
+            color: #000;
+            transform: scale(1.2);
+        }
+
+    /* Chat box */
+    #chatMessages {
+        height: 300px;
+        overflow-y: auto;
+        border-radius: 12px;
+        padding: 15px;
+        background: #f4f6fb;
+        box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+        font-family: 'Segoe UI', sans-serif;
+        line-height: 1.5;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    /* Сообщения */
+    .chat-user, .chat-bot {
+        max-width: 80%;
+        padding: 8px 12px;
+        border-radius: 12px;
+        font-size: 14px;
+        line-height: 1.4;
+        word-wrap: break-word;
+    }
+
+    .chat-user {
+        background: #3b82f6;
+        color: #fff;
+        align-self: flex-end;
+    }
+
+    .chat-bot {
+        background: #e0e7ff;
+        color: #1e293b;
+        align-self: flex-start;
+    }
+
+    /* Инпут и кнопка */
+    #chatInput {
+        flex: 1;
+        padding: 10px;
+        border-radius: 12px;
+        border: 1px solid #cbd5e1;
+        transition: all 0.2s;
+    }
+
+        #chatInput:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 8px rgba(99,102,241,0.3);
+        }
+
+    .wa-modal-content button {
+        background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+        color: white;
+        padding: 10px 15px;
+        border-radius: 12px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+        .wa-modal-content button:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 12px 25px rgba(59,130,246,0.3);
+        }
+
+    /* Стили оставлены твои + новые кнопки чат-бота */
+    .chat-btn {
+        background: linear-gradient(90deg, #10b981, #06b6d4);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 12px;
+        font-weight: bold;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+        .chat-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(16,185,129,0.4);
+        }
+    /* остальные стили оставляем без изменений */
+
+    /* Модальные окна */
+    .modal, .wa-modal {
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        background-color: rgba(0,0,0,0.6);
+        animation: fadeIn 0.3s ease;
+    }
+
+    .modal-content, .wa-modal-content {
+        background: linear-gradient(135deg, #ffffff, #f0f4ff);
+        padding: 20px;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 380px;
+        position: relative;
+        text-align: center;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        transform: translateY(-20px);
+        transition: transform 0.3s ease;
+        overflow-y: auto;
+        max-height: 90vh;
+    }
+
+        .modal-content.show, .wa-modal-content.show {
+            transform: translateY(0);
+        }
+
+    .close, .wa-close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        font-size: 26px;
+        font-weight: bold;
+        color: #555;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+
+        .close:hover, .wa-close:hover {
+            color: #000;
+        }
+
+    /* Кнопки */
+    .auth-links a {
+        display: inline-block;
+        text-decoration: none;
+        font-weight: 600;
+        padding: 10px 22px;
+        margin: 5px;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        color: white;
+        font-size: 15px;
+        box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+    }
+
+    .login-btn {
+        background: linear-gradient(90deg, #3b82f6, #6366f1);
+    }
+
+        .login-btn:hover {
+            background: linear-gradient(90deg, #6366f1, #3b82f6);
+            box-shadow: 0 6px 18px rgba(99,102,241,0.5);
+        }
+
+    .register-btn {
+        background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+    }
+
+        .register-btn:hover {
+            background: linear-gradient(90deg, #a78bfa, #8b5cf6);
+            box-shadow: 0 6px 18px rgba(139,92,246,0.5);
+        }
+
+    .auth-links a:active {
+        transform: translateY(1px);
+        box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+    }
+
+    /* Кнопки модальных окон */
+    .modal-content button, .wa-action-btn, .wa-btn {
+        background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+        color: white;
+        width: 100%;
+        padding: 10px 15px;
+        border-radius: 10px;
+        font-weight: bold;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 15px;
+        margin-top: 10px;
+    }
+
+        .modal-content button:hover, .wa-action-btn:hover, .wa-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(99,102,241,0.4);
+        }
+
+    /* User card */
+    .user-card {
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        color: white;
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+
+        .user-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .user-card img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 10px;
+            border: 2px solid rgba(255,255,255,0.6);
+        }
+
+    .logout-btn {
+        background: white;
+        color: #3b82f6;
+        border-radius: 10px;
+        padding: 8px 12px;
+        font-weight: bold;
+        border: none;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+
+        .logout-btn:hover {
+            background: #f0f0ff;
+        }
+
+    /* Cards */
+    .card {
+        padding: 15px 20px;
+        border-radius: 12px;
+        background-color: #ffffff;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+
+    /* Typography */
+    .italic {
+        font-style: italic;
+    }
+
+    .feature-list {
+        list-style: none;
+        padding-left: 0;
+    }
+
+        .feature-list li {
+            margin-bottom: 12px;
+            font-size: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+            .feature-list li strong {
+                display: inline-block;
+                margin-right: 4px;
+            }
+
+    input, select {
+        width: 100%;
+        padding: 8px 10px;
+        margin-top: 5px;
+        margin-bottom: 8px;
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
+        transition: all 0.2s;
+    }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 5px rgba(59,130,246,0.4);
+        }
+
+    /* Animations */
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    @@keyframes fadeUp {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .content p, .content ul li {
+        opacity: 0;
+        transform: translateY(10px);
+        animation: fadeUp 0.5s forwards;
+    }
+
+        .content p:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .content ul li:nth-child(1) {
+            animation-delay: 0.2s;
+        }
+
+        .content ul li:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+
+        .content ul li:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+</style>
+
+<script>
+    // --- Модальные окна ---
+    function openLogin() {
+        const modal = document.getElementById('loginModal');
+        modal.style.display = 'flex';
+        modal.querySelector('.modal-content').classList.add('show');
+    }
+    function closeLogin() {
+        const modal = document.getElementById('loginModal');
+        modal.querySelector('.modal-content').classList.remove('show');
+        setTimeout(()=> modal.style.display = 'none', 300);
+    }
+
+    function openRegister() {
+        const modal = document.getElementById('registerModal');
+        modal.style.display = 'flex';
+        modal.querySelector('.modal-content').classList.add('show');
+    }
+    function closeRegister() {
+        const modal = document.getElementById('registerModal');
+        modal.querySelector('.modal-content').classList.remove('show');
+        setTimeout(()=> modal.style.display = 'none', 300);
+    }
+
+    function openWhatsappModal() {
+        const modal = document.getElementById("whatsappModal");
+        modal.style.display = "flex";
+        modal.querySelector('.wa-modal-content').classList.add('show');
+    }
+    function closeWhatsappModal() {
+        const modal = document.getElementById("whatsappModal");
+        modal.querySelector('.wa-modal-content').classList.remove('show');
+        setTimeout(()=> modal.style.display = 'none', 300);
+    }
+
+    function openChatModal() {
+        const modal = document.getElementById("chatModal");
+        modal.style.display = "flex";
+        modal.querySelector('.wa-modal-content').classList.add('show');
+    }
+    function closeChatModal() {
+        const modal = document.getElementById("chatModal");
+        modal.querySelector('.wa-modal-content').classList.remove('show');
+        setTimeout(()=> modal.style.display = 'none', 300);
+    }
+
+    // --- Чат-бот с эффектом печати ---
+    async function sendMessage() {
+        const input = document.getElementById('chatInput');
+        const message = input.value.trim();
+        if(!message) return;
+
+        const chatBox = document.getElementById('chatMessages');
+        chatBox.innerHTML += `<div><strong>Вы:</strong> ${message}</div>`;
+        input.value = '';
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        try {
+            const response = await fetch('/Home/ChatBot', {
+                method: 'POST',
+                headers: { 'Content-Type':'application/json' },
+                body: JSON.stringify({ message })
+            });
+            const data = await response.json();
+
+            // Эффект печати
+            const botDiv = document.createElement('div');
+            botDiv.innerHTML = "<strong>Бот:</strong> <span class='typing'></span>";
+            chatBox.appendChild(botDiv);
+
+            const typingSpan = botDiv.querySelector('.typing');
+            let i = 0;
+            const text = data.response;
+            const interval = setInterval(() => {
+                typingSpan.textContent += text[i];
+                i++;
+                chatBox.scrollTop = chatBox.scrollHeight;
+                if(i >= text.length) clearInterval(interval);
+            }, 20); // скорость печати: 20мс на символ
+
+        } catch (error) {
+            chatBox.innerHTML += `<div><strong>Бот:</strong> Ошибка сервера.</div>`;
+        }
+    }
+
+    // --- Закрытие модальных окон при клике на фон ---
+    window.addEventListener('click', function(event) {
+        if(event.target == document.getElementById('loginModal')) closeLogin();
+        if(event.target == document.getElementById('registerModal')) closeRegister();
+        if(event.target == document.getElementById('whatsappModal')) closeWhatsappModal();
+        if(event.target == document.getElementById('chatModal')) closeChatModal();
+    });
+
+    // --- Автооткрытие модальных окон при ошибках ---
+    @if (TempData["LoginError"] != null)
+    {
+        <text>openLogin();</text>
+    }
+    @if (TempData["RegisterError"] != null)
+    {
+        <text>openRegister();</text>
+    }
+</script>
+
+
+
+
+

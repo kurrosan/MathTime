@@ -1,0 +1,130 @@
+﻿@{
+    ViewData["Title"] = "Подтверждение Email";
+}
+
+<style>
+    .verify-wrapper {
+        max-width: 400px;
+        margin: 40px auto;
+        padding: 40px;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        text-align: center;
+        animation: fadeIn 0.5s ease;
+    }
+
+        .verify-wrapper h2 {
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+            color: #4f46e5;
+        }
+
+        .verify-wrapper p {
+            font-size: 0.95rem;
+            color: #6b7280;
+            margin-bottom: 20px;
+        }
+
+    .form-group {
+        margin-bottom: 20px;
+        text-align: left;
+    }
+
+    label {
+        font-weight: 600;
+        display: block;
+        margin-bottom: 5px;
+        color: #4f46e5;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px;
+        border-radius: 12px;
+        border: 1px solid #d1d5db;
+        font-size: 1.1rem;
+        text-align: center;
+        letter-spacing: 0.25em;
+        box-sizing: border-box;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+        .form-control:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 8px rgba(99,102,241,0.3);
+            outline: none;
+        }
+
+    .btn {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #fff;
+        cursor: pointer;
+        background: linear-gradient(90deg, #4f46e5, #6366f1);
+        transition: transform 0.2s, box-shadow 0.2s;
+        margin-top: 10px;
+    }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(99,102,241,0.5);
+        }
+
+    .resend-link {
+        display: block;
+        margin-top: 20px;
+        font-size: 0.95rem;
+        color: #6366f1;
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+
+        .resend-link:hover {
+            color: #4f46e5;
+        }
+
+    @@keyframes fadeIn {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+</style>
+
+<div class="verify-wrapper">
+
+    <h2>Подтверждение Email</h2>
+    <p>Мы отправили 6-значный код подтверждения на ваш email</p>
+
+    @if (TempData["VerifyError"] != null)
+    {
+        <div class="alert alert-danger text-center small mb-3">
+            @TempData["VerifyError"]
+        </div>
+    }
+
+    <form method="post" asp-action="VerifyEmail">
+        <div class="form-group">
+            <label>Введите код</label>
+            <input type="text" name="code" maxlength="6" class="form-control" placeholder="••••••" required />
+        </div>
+
+        <button type="submit" class="btn">Подтвердить</button>
+    </form>
+
+    <a href="/resend-code" class="resend-link">Отправить код ещё раз</a>
+
+</div>

@@ -1,0 +1,265 @@
+﻿@model MathTime.Models.User
+
+@using System.Security.Claims
+
+@{
+    ViewData["Title"] = "Профиль пользователя";
+
+    string genderRu = Model.Gender?.ToLower() switch
+    {
+        "male" => "Мужской",
+        "female" => "Женский",
+        _ => "Не указан"
+    };
+
+    bool isAdmin = User.IsInRole("Admin");
+
+    int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out int currentUserId);
+    bool isOwner = currentUserId == Model.Id;
+
+    int totalUsers = ViewBag.TotalUsers ?? 0;
+    int blockedUsers = ViewBag.BlockedUsers ?? 0;
+}
+
+<style>
+    .profile-wrapper {
+        min-height: calc(100vh - 100px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: linear-gradient(135deg, #eef2f3, #dfe9f3);
+        padding: 20px;
+    }
+
+    .profile-card {
+        width: 100%;
+        max-width: 480px;
+        background: #fff;
+        border-radius: 16px;
+        padding: 30px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        text-align: center;
+        animation: fadeIn 0.5s ease;
+    }
+
+    .avatar-form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .profile-avatar {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #f0f0f0;
+        margin-bottom: 10px;
+    }
+
+    input[type="file"] {
+        margin-top: 10px;
+    }
+
+    .profile-title {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+    }
+
+    .chip {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 999px;
+        background: #0d6efd;
+        color: white;
+        font-size: 0.85rem;
+        margin-bottom: 10px;
+    }
+
+    .profile-info {
+        margin-top: 20px;
+        text-align: left;
+    }
+
+        .profile-info div {
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+    .muted {
+        font-weight: bold;
+        color: #555;
+    }
+
+    .actions, .admin-actions {
+        margin-top: 20px;
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        flex: 1 1 0;
+        padding: 10px 16px;
+        border: none;
+        border-radius: 8px;
+        color: #fff;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+        font-size: 1rem;
+        min-width: 100px;
+    }
+
+    .btn-primary {
+        background: #0d6efd;
+    }
+
+    .btn-danger {
+        background: #d9534f;
+    }
+
+    .btn-warning {
+        background: #6f42c1;
+    }
+
+    .btn-admin {
+        background: #6610f2;
+    }
+
+    .btn-primary:hover {
+        background: #0b5ed7;
+    }
+
+    .btn-danger:hover {
+        background: #c9302c;
+    }
+
+    .btn-warning:hover {
+        background: #5936a2;
+    }
+
+    .btn-admin:hover {
+        background: #520dc2;
+    }
+
+    .admin-stats {
+        margin-top: 20px;
+        background: #f4f6f9;
+        padding: 15px;
+        border-radius: 10px;
+        text-align: left;
+    }
+
+        .admin-stats h4 {
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .admin-stats div {
+            margin-bottom: 6px;
+        }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+
+<div class="profile-wrapper">
+    <div class="profile-card">
+
+      
+
+                @* ===== АВАТАР (только отображение) ===== *@
+                <img class="profile-avatar" src="/avatar/@Model.Id" alt="Аватар">
+
+                <h2 class="profile-title">@Model.FirstName @Model.LastName</h2>
+                <span class="chip">@Model.Role</span>
+
+                <div class="profile-info">
+                    <div><span class="muted">Email:</span> @Model.Email</div>
+                    <div><span class="muted">Телефон:</span> @Model.Phone</div>
+                    <div><span class="muted">Дата рождения:</span> @Model.DateOfBirth.ToString("dd.MM.yyyy")</div>
+                    <div><span class="muted">Пол:</span> @genderRu</div>
+                </div>
+
+      
+
+        @* ===== СТАТИСТИКА ДЛЯ АДМИНА ===== *@
+        @if (isAdmin)
+        {
+            <div class="admin-stats">
+                <h4>Статистика сайта</h4>
+                <div>👥 Всего пользователей: <b>@totalUsers</b></div>
+                <div>🚫 Заблокировано: <b>@blockedUsers</b></div>
+            </div>
+        }
+
+        <div class="actions">
+            <a href="~/" class="btn btn-primary">На главную</a>
+
+            @if (isOwner || isAdmin)
+            {
+                <a href="/profile/edit" class="btn btn-warning">Редактировать</a>
+            }
+
+            @if (isAdmin)
+            {
+                <a href="/admin/users" class="btn btn-admin">Админ-панель</a>
+            }
+
+            <form method="post" action="/logout" style="margin:0; flex:1;">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-danger">Выйти</button>
+            </form>
+        </div>
+
+        @if (isAdmin && !isOwner)
+        {
+            <hr />
+            <h4>Администрирование</h4>
+
+            <div class="admin-actions">
+                <a href="/admin/edit/@Model.Id" class="btn btn-warning">Редактировать</a>
+
+                <form method="post"
+                      action="/admin/delete/@Model.Id"
+                      style="margin:0; flex:1;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit"
+                            class="btn btn-danger"
+                            onclick="return confirm('Удалить пользователя? Это действие необратимо.')">
+                        Удалить
+                    </button>
+                </form>
+            </div>
+
+            <div class="admin-actions" style="margin-top:10px;">
+                @if (!Model.IsBlocked)
+                {
+                    <form method="post" action="/admin/block/@Model.Id">
+                        <button type="submit" class="btn btn-danger">Заблокировать</button>
+                    </form>
+                }
+                else
+                {
+                    <form method="post" action="/admin/unblock/@Model.Id">
+                        <button type="submit" class="btn btn-primary">Разблокировать</button>
+                    </form>
+                }
+            </div>
+        }
+    </div>
+</div>
