@@ -4,13 +4,9 @@
     ViewData["Title"] = "Статьи";
 
     string currentRole = User.FindFirstValue(ClaimTypes.Role) ?? "";
-    string userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-    int currentUserId = 0;
 
-    if (!string.IsNullOrEmpty(userIdStr))
-    {
-        currentUserId = int.Parse(userIdStr);
-    }
+    var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    int.TryParse(userIdStr, out int currentUserId);
 
     bool isAdmin = string.Equals(currentRole, "Admin", StringComparison.OrdinalIgnoreCase);
 }
