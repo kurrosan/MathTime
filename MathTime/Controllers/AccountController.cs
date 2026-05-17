@@ -366,6 +366,7 @@ namespace MathTime.Controllers
             return Json(new { success = true, count = likeCount });
         }
 
+    
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> AddComment(int articleId, string content)
@@ -373,7 +374,13 @@ namespace MathTime.Controllers
             if (string.IsNullOrWhiteSpace(content))
                 return Json(new { success = false, error = "Комментарий не может быть пустым" });
 
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userIdValue))
+                return Unauthorized();
+
+            if (!int.TryParse(userIdValue, out int userId))
+                return Unauthorized();
 
             var comment = new Comment
             {
@@ -387,6 +394,9 @@ namespace MathTime.Controllers
             await _db.SaveChangesAsync();
 
             var user = await _db.Users.FindAsync(userId);
+
+            if (user == null)
+                return Json(new { success = false, error = "Пользователь не найден" });
 
             return Json(new
             {
