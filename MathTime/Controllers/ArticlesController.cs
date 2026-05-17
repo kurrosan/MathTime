@@ -120,6 +120,7 @@ namespace MathTime.Controllers
 
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userIdClaim == null) return Unauthorized();
+
             var userId = int.Parse(userIdClaim);
 
             var comment = new Comment
@@ -135,6 +136,10 @@ namespace MathTime.Controllers
 
             var user = await _context.Users.FindAsync(userId);
 
+            var userName = user != null
+                ? $"{user.FirstName} {user.LastName}".Trim()
+                : "Unknown user";
+
             return Json(new
             {
                 success = true,
@@ -142,7 +147,7 @@ namespace MathTime.Controllers
                 {
                     id = comment.Id,
                     content = comment.Content,
-                    userName = $"{user.FirstName} {user.LastName}".Trim(),
+                    userName,
                     createdAt = comment.CreatedAt.ToString("g")
                 }
             });
