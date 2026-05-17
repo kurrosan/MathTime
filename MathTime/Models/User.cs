@@ -10,25 +10,30 @@ namespace MathTime.Models
         public int Id { get; set; }
 
         [Required, MaxLength(50)]
-        public string FirstName { get; set; }
+        public string FirstName { get; set; } = null!;
 
         [Required, MaxLength(50)]
-        public string LastName { get; set; }
+        public string LastName { get; set; } = null!;
+
 
         [Required, MaxLength(20)]
-        public string Phone { get; set; }
+        public string Phone { get; set; } = null!;
+
 
         [Required, MaxLength(100), EmailAddress]
-        public string Email { get; set; }
+        public string Email { get; set; } = null!;
+
 
         [Required, MaxLength(255)]
-        public string PasswordHash { get; set; }
+        public string PasswordHash { get; set; } = null!;
+
 
         [Required]
         public DateTime DateOfBirth { get; set; }
 
         [Required, MaxLength(10)]
-        public string Gender { get; set; }
+        public string Gender { get; set; } = null!;
+
 
         [Required, MaxLength(50)]
         public string Role { get; set; } = "User";

@@ -136,20 +136,38 @@ namespace MathTime.Controllers
         [Authorize]
         public async Task<IActionResult> ResendCode()
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (!int.TryParse(userIdClaim, out var userId))
+                return Unauthorized();
+
             var user = await _db.Users.FindAsync(userId);
 
             if (user == null)
                 return RedirectToAction("Index", "Home");
 
             user.VerificationCode = GenerateVerificationCode();
+
             await _db.SaveChangesAsync();
 
             await _email.SendEmailAsync(
                 user.Email,
                 "Новый код подтверждения — MathTime",
-                $"<div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background: #f7f8fc; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);\"><h2 style=\"color: #333; font-weight: 600; margin-bottom: 20px;\">Ваш код подтверждения</h2><h1 style=\"color: #4f46e5; font-size: 48px; letter-spacing: 2px; margin: 0;\">{user.VerificationCode}</h1><p style=\"color: #666; margin-top: 20px; font-size: 16px;\">Введите этот код, чтобы подтвердить свой аккаунт</p></div>"
-   );
+                $@"
+        <div style=""font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background: #f7f8fc; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);"">
+            <h2 style=""color: #333; font-weight: 600; margin-bottom: 20px;"">
+                Ваш код подтверждения
+            </h2>
+
+            <h1 style=""color: #4f46e5; font-size: 48px; letter-spacing: 2px; margin: 0;"">
+                {user.VerificationCode}
+            </h1>
+
+            <p style=""color: #666; margin-top: 20px; font-size: 16px;"">
+                Введите этот код, чтобы подтвердить свой аккаунт
+            </p>
+        </div>"
+            );
 
             TempData["VerifyError"] = "Новый код отправлен!";
             return RedirectToAction("EmailConfirmation");
@@ -160,16 +178,27 @@ namespace MathTime.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> VerifyEmail(string code)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (!int.TryParse(userIdClaim, out var userId))
+                return Unauthorized();
+
             var user = await _db.Users.FindAsync(userId);
 
             if (user == null)
                 return RedirectToAction("Index", "Home");
 
+            if (string.IsNullOrWhiteSpace(code))
+            {
+                TempData["VerifyError"] = "Введите код подтверждения.";
+                return RedirectToAction("EmailConfirmation");
+            }
+
             if (user.VerificationCode == code)
             {
                 user.EmailVerified = true;
                 user.VerificationCode = null;
+
                 await _db.SaveChangesAsync();
 
                 TempData["VerifySuccess"] = "Email успешно подтверждён!";
@@ -179,7 +208,6 @@ namespace MathTime.Controllers
             TempData["VerifyError"] = "Неверный код подтверждения.";
             return RedirectToAction("EmailConfirmation");
         }
-
         private string GenerateVerificationCode()
         {
             using var rng = RandomNumberGenerator.Create();
@@ -229,15 +257,21 @@ namespace MathTime.Controllers
                 });
         }
 
-        // ===============================
-        // PROFILE
-        // ===============================
         [Authorize]
         [HttpGet("/profile")]
         public async Task<IActionResult> Profile()
         {
-            var id = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            var user = await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (!int.TryParse(userIdClaim, out var id))
+            {
+                await HttpContext.SignOutAsync();
+                return RedirectToAction("Index", "Home");
+            }
+
+            var user = await _db.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == id);
 
             if (user == null)
             {
@@ -260,30 +294,38 @@ namespace MathTime.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateAvatar(IFormFile Avatar)
         {
-            if (Avatar != null && Avatar.Length > 0)
-            {
-                var id = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-                var user = await _db.Users.FindAsync(id);
+            if (Avatar == null || Avatar.Length == 0)
+                return RedirectToAction("Profile");
 
-                if (user != null)
-                {
-                    using var ms = new MemoryStream();
-                    await Avatar.CopyToAsync(ms);
-                    user.Avatar = ms.ToArray();
-                    await _db.SaveChangesAsync();
-                }
-            }
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (!int.TryParse(userIdClaim, out var id))
+                return Unauthorized();
+
+            var user = await _db.Users.FindAsync(id);
+
+            if (user == null)
+                return RedirectToAction("Index", "Home");
+
+            using var ms = new MemoryStream();
+            await Avatar.CopyToAsync(ms);
+
+            user.Avatar = ms.ToArray();
+
+            await _db.SaveChangesAsync();
+
             return RedirectToAction("Profile");
         }
 
-        // ===============================
-        // EDIT PROFILE
-        // ===============================
         [Authorize]
         [HttpGet("/profile/edit")]
         public async Task<IActionResult> EditProfile()
         {
-            var id = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (!int.TryParse(userIdClaim, out var id))
+                return Unauthorized();
+
             var user = await _db.Users.FindAsync(id);
 
             if (user == null)
@@ -296,11 +338,15 @@ namespace MathTime.Controllers
         [HttpPost("/profile/edit")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditProfile(
-            string FirstName, string LastName, string Email,
-            string Phone, DateTime DateOfBirth, string Gender,
-            string? NewPassword, string? ConfirmPassword)
+     string FirstName, string LastName, string Email,
+     string Phone, DateTime DateOfBirth, string Gender,
+     string? NewPassword, string? ConfirmPassword)
         {
-            var id = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (!int.TryParse(userIdClaim, out var id))
+                return Unauthorized();
+
             var user = await _db.Users.FindAsync(id);
 
             if (user == null)
@@ -313,7 +359,7 @@ namespace MathTime.Controllers
             user.DateOfBirth = DateOfBirth;
             user.Gender = Gender;
 
-            if (!string.IsNullOrEmpty(NewPassword))
+            if (!string.IsNullOrWhiteSpace(NewPassword))
             {
                 if (NewPassword != ConfirmPassword)
                 {
@@ -343,30 +389,39 @@ namespace MathTime.Controllers
             return File(user.Avatar, "image/jpeg");
         }
 
-        // ===============================
-        // LIKE / COMMENT
-        // ===============================
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> Like(int articleId)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (!int.TryParse(userIdClaim, out var userId))
+                return Unauthorized();
 
             var existingLike = await _db.Likes
                 .FirstOrDefaultAsync(l => l.ArticleId == articleId && l.UserId == userId);
 
             if (existingLike != null)
+            {
                 _db.Likes.Remove(existingLike);
+            }
             else
-                _db.Likes.Add(new Like { ArticleId = articleId, UserId = userId });
+            {
+                _db.Likes.Add(new Like
+                {
+                    ArticleId = articleId,
+                    UserId = userId
+                });
+            }
 
             await _db.SaveChangesAsync();
 
             var likeCount = await _db.Likes.CountAsync(l => l.ArticleId == articleId);
+
             return Json(new { success = true, count = likeCount });
         }
 
-    
+
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> AddComment(int articleId, string content)

@@ -16,19 +16,36 @@ namespace MathTime.Services
         public async Task SendEmailAsync(string to, string subject, string message)
         {
             var host = _config["EmailSettings:Host"];
-            var port = int.Parse(_config["EmailSettings:Port"]);
+
+            var portValue = _config["EmailSettings:Port"];
             var email = _config["EmailSettings:Email"];
             var password = _config["EmailSettings:Password"];
-            var ssl = bool.Parse(_config["EmailSettings:EnableSSL"]);
+            var sslValue = _config["EmailSettings:EnableSSL"];
 
-            var smtp = new SmtpClient(host, port)
+            if (string.IsNullOrWhiteSpace(host) ||
+                string.IsNullOrWhiteSpace(portValue) ||
+                string.IsNullOrWhiteSpace(email) ||
+                string.IsNullOrWhiteSpace(password))
+            {
+                throw new InvalidOperationException("Email settings are not configured properly.");
+            }
+
+            if (!int.TryParse(portValue, out var port))
+                throw new InvalidOperationException("Invalid SMTP port configuration.");
+
+            if (!bool.TryParse(sslValue, out var ssl))
+                ssl = true;
+
+            using var smtp = new SmtpClient(host, port)
             {
                 Credentials = new NetworkCredential(email, password),
                 EnableSsl = ssl
             };
 
-            var mail = new MailMessage(email, to, subject, message);
-            mail.IsBodyHtml = true;
+            using var mail = new MailMessage(email, to, subject, message)
+            {
+                IsBodyHtml = true
+            };
 
             await smtp.SendMailAsync(mail);
         }
